@@ -3,8 +3,8 @@ const path = require('path');
 const { marked } = require('marked');
 
 // Pega os argumentos da linha de comando
-const inputFile = process.argv[2] || 'xfx-theme/exemplo.md';
-const outputFile = process.argv[3] || 'xfx-theme/mapa.html';
+const inputFile = process.argv[2] || 'xfx-theme/modulo-1/md/exemplo.md';
+const outputFile = process.argv[3] || 'xfx-theme/modulo-1/html/mapa.html';
 
 // Lê o template
 const template = fs.readFileSync('template-xfx.html', 'utf8');

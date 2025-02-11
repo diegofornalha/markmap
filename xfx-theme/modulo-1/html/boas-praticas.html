@@ -38,43 +38,19 @@ body {
 
 /* Estilos para o preview de imagem */
 .topic-image-preview {
-  position: absolute;
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  pointer-events: none;
-  z-index: 9999;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  border: 2px solid #FF0000;
-  background-color: #fff;
+  position: fixed;
+  max-width: 200px;
+  max-height: 200px;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   opacity: 0;
   transition: opacity 0.3s ease;
-}
-
-.image-layer {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
   pointer-events: none;
-  z-index: 100;
+  z-index: 1000;
 }
 
-.topic-image {
-  position: absolute;
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  border: 2px solid #FF0000;
-  background-color: #fff;
+.topic-image-preview.visible {
+  opacity: 1;
 }
 </style>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/markmap-toolbar@0.18.9/dist/style.css">
@@ -117,7 +93,7 @@ body {
   };
 
   // Dados do mapa mental (serão substituídos pelo script)
-  const data = __MARKMAP_DATA__;
+  const data = {"content":"Boas Práticas para Mapas Mentais","children":[{"content":"Estrutura do Markdown","children":[{"content":"Hierarquia Clara","children":[{"content":"Use `#` para título principal","children":[],"payload":{"tag":"li"}},{"content":"Use `##` para seções principais","children":[],"payload":{"tag":"li"}},{"content":"Use `###` para subseções","children":[],"payload":{"tag":"li"}},{"content":"Use `-` para tópicos dentro das seções","children":[],"payload":{"tag":"li"}}],"payload":{"tag":"heading"}},{"content":"Formatação do Conteúdo","children":[{"content":"Mantenha textos concisos e diretos","children":[],"payload":{"tag":"li"}},{"content":"Use palavras-chave ao invés de frases longas","children":[],"payload":{"tag":"li"}},{"content":"Evite redundâncias","children":[],"payload":{"tag":"li"}},{"content":"Remova artigos e palavras desnecessárias","children":[],"payload":{"tag":"li"}}],"payload":{"tag":"heading"}},{"content":"Organização Visual","children":[{"content":"Cada conceito em seu próprio nível","children":[],"payload":{"tag":"li"}},{"content":"Agrupe informações relacionadas","children":[],"payload":{"tag":"li"}},{"content":"Mantenha consistência na estrutura","children":[],"payload":{"tag":"li"}},{"content":"Use no máximo 3 níveis de profundidade","children":[],"payload":{"tag":"li"}}],"payload":{"tag":"heading"}}],"payload":{"tag":"heading"}},{"content":"Exemplo de Estrutura","children":[],"payload":{"tag":"heading"}},{"content":"O Que Evitar","children":[{"content":"**Textos Longos**\n- ❌ \"Esta é uma explicação muito longa sobre o conceito\"\n- ✅ \"Conceito principal\"","children":[],"payload":{"tag":"li"}},{"content":"**Redundâncias**\n- ❌ \"Sistema de Gerenciamento de Banco de Dados para Gestão\"\n- ✅ \"Banco de Dados\"","children":[],"payload":{"tag":"li"}},{"content":"**Níveis Excessivos**\n- ❌ Mais de 3 níveis de profundidade\n- ✅ Máximo 3 níveis (# > ## > ###)","children":[],"payload":{"tag":"li"}}],"payload":{"tag":"heading"}},{"content":"Dicas Adicionais","children":[{"content":"**Consistência**\n- Mantenha o mesmo padrão em todo o documento\n- Use a mesma estrutura para seções similares\n- Mantenha a formatação uniforme","children":[],"payload":{"tag":"li"}},{"content":"**Clareza**\n- Priorize termos técnicos precisos\n- Evite abreviações não padrão\n- Use termos conhecidos da área","children":[],"payload":{"tag":"li"}},{"content":"**Visual**\n- Espaçamento adequado entre seções\n- Alinhamento consistente\n- Estrutura limpa e organizada","children":[],"payload":{"tag":"li"}}],"payload":{"tag":"heading"}}]};
   
   // Cria a instância do markmap
   window.mm = markmap.Markmap.create(
@@ -227,49 +203,54 @@ body {
   el.style.right = "20px";
   document.body.append(el);
 
-  // Cria a camada de imagens
-  const imageLayer = document.createElement('div');
-  imageLayer.className = 'image-layer';
-  document.body.appendChild(imageLayer);
+  // Configuração do preview de imagem
+  const imagePreview = document.getElementById('imagePreview');
+  let currentHoveredNode = null;
 
-  // Função para posicionar as imagens
-  function setupImages() {
-    // Limpa a camada
-    imageLayer.innerHTML = '';
+  // Função para mostrar a imagem
+  function showImage(event, node) {
+    if (currentHoveredNode === node) return;
+    currentHoveredNode = node;
     
-    // Adiciona imagens para cada nó
-    d3.select('#mindmap')
-      .selectAll('g')
-      .each(function(d) {
-        if (!d) return;
-        
-        const node = d3.select(this);
-        const circle = node.select('circle');
-        
-        if (!circle.empty()) {
-          const topicName = d.data.content.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-          const rect = circle.node().getBoundingClientRect();
-          
-          // Cria elemento da imagem
-          const img = document.createElement('div');
-          img.className = 'topic-image';
-          img.style.backgroundImage = `url(images/${topicName}.png)`;
-          img.style.left = `${rect.x - 50}px`;
-          img.style.top = `${rect.y - 120}px`;
-          
-          imageLayer.appendChild(img);
+    const topicName = node.content.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    const imagePath = `images/${topicName}.png`;
+    
+    imagePreview.style.left = `${event.pageX + 20}px`;
+    imagePreview.style.top = `${event.pageY + 20}px`;
+    
+    // Verifica se a imagem existe
+    fetch(imagePath)
+      .then(response => {
+        if (response.ok) {
+          imagePreview.style.backgroundImage = `url(${imagePath})`;
+          imagePreview.classList.add('visible');
         }
+      })
+      .catch(() => {
+        imagePreview.classList.remove('visible');
       });
   }
 
-  // Atualiza as imagens quando necessário
-  window.mm.on('renderData', () => {
-    setTimeout(setupImages, 100);
-  });
+  // Função para esconder a imagem
+  function hideImage() {
+    currentHoveredNode = null;
+    imagePreview.classList.remove('visible');
+  }
 
-  window.mm.on('zoom', setupImages);
-  window.mm.on('pan', setupImages);
-})();
-</script>
+  // Adiciona os event listeners para os nós
+  d3.select('#mindmap')
+    .selectAll('circle')
+    .on('mouseover', function(event, d) {
+      showImage(event, d);
+    })
+    .on('mouseout', function() {
+      hideImage();
+    });
+
+  // Ajuste automático ao renderizar
+  window.mm.on('renderData', () => {
+    setTimeout(() => window.mm.fit(), 300);
+  });
+})();</script>
 </body>
 </html>

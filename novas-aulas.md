@@ -1,5 +1,4 @@
 
-node generate-map.js xfx-theme/aula-04.md xfx-theme/aula-04.html
 
 node generate-map.js xfx-theme/aula-05.md xfx-theme/aula-05.html
 

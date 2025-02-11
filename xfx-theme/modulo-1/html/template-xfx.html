@@ -1,0 +1,116 @@
+.topic-image-preview {
+  position: fixed;
+  width: 100px;
+  height: 100px;
+  border: 2px solid red;
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  display: none;
+  z-index: 1000;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.topic-image {
+  position: fixed;
+  width: 80px;
+  height: 80px;
+  border: 2px solid red;
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  z-index: 9999;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+function addImagePreview() {
+  const preview = document.createElement('div');
+  preview.className = 'topic-image-preview';
+  document.body.appendChild(preview);
+
+  document.querySelectorAll('.markmap-node').forEach(node => {
+    const text = node.textContent.trim().toLowerCase();
+    const imagePath = `images/${text}.png`;
+
+    node.addEventListener('mouseover', (e) => {
+      const img = new Image();
+      img.onload = () => {
+        preview.style.backgroundImage = `url(${imagePath})`;
+        preview.style.display = 'block';
+        preview.style.left = (e.pageX + 20) + 'px';
+        preview.style.top = (e.pageY - 50) + 'px';
+      };
+      img.src = imagePath;
+    });
+
+    node.addEventListener('mouseout', () => {
+      preview.style.display = 'none';
+    });
+
+    node.addEventListener('mousemove', (e) => {
+      preview.style.left = (e.pageX + 20) + 'px';
+      preview.style.top = (e.pageY - 50) + 'px';
+    });
+  });
+}
+
+// Função simplificada para adicionar imagens
+function addImagesToNodes() {
+  console.log('Iniciando adição de imagens...');
+  
+  // Remove imagens existentes
+  document.querySelectorAll('.topic-image').forEach(img => img.remove());
+  
+  // Adiciona novas imagens
+  document.querySelectorAll('.markmap-node').forEach(node => {
+    const text = node.textContent.trim().toLowerCase();
+    console.log('Processando nó:', text);
+    
+    const imagePath = `images/${text}.png`;
+    console.log('Caminho da imagem:', imagePath);
+    
+    // Cria elemento de imagem
+    const imageDiv = document.createElement('div');
+    imageDiv.className = 'topic-image';
+    
+    // Posiciona a imagem
+    const rect = node.getBoundingClientRect();
+    imageDiv.style.left = `${rect.left}px`;
+    imageDiv.style.top = `${rect.top - 100}px`;
+    
+    // Carrega a imagem
+    imageDiv.style.backgroundImage = `url(${imagePath})`;
+    document.body.appendChild(imageDiv);
+    
+    console.log('Imagem adicionada para:', text);
+  });
+}
+
+// Função para verificar quando o mapa está pronto
+function checkMapReady() {
+  console.log('Verificando se o mapa está pronto...');
+  const nodes = document.querySelectorAll('.markmap-node');
+  
+  if (nodes.length > 0) {
+    console.log('Mapa pronto! Encontrados', nodes.length, 'nós');
+    addImagesToNodes();
+    
+    // Adiciona listeners para atualização
+    window.addEventListener('resize', addImagesToNodes);
+    document.addEventListener('wheel', addImagesToNodes);
+    document.addEventListener('mouseup', addImagesToNodes);
+  } else {
+    console.log('Mapa ainda não está pronto, tentando novamente...');
+    setTimeout(checkMapReady, 500);
+  }
+}
+
+// Inicia o processo
+window.addEventListener('load', () => {
+  console.log('Página carregada, iniciando verificação do mapa...');
+  setTimeout(checkMapReady, 1000);
+}); 
