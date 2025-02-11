@@ -1,116 +1,190 @@
-.topic-image-preview {
-  position: fixed;
-  width: 100px;
-  height: 100px;
-  border: 2px solid red;
-  border-radius: 10px;
-  background-color: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-  display: none;
-  z-index: 1000;
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<title>Markmap - Modo XFX</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
 }
-
-.topic-image {
-  position: fixed;
-  width: 80px;
-  height: 80px;
-  border: 2px solid red;
-  border-radius: 10px;
-  background-color: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-  z-index: 9999;
+body {
+  background: url('xfx.png') no-repeat center top fixed;
   background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
+  background-color: transparent;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
 }
+#mindmap {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+  background-color: transparent;
+}
+.markmap-node-text {
+  fill: #333 !important;
+  font-weight: 600 !important;
+  text-shadow: 0 0 3px rgba(255, 255, 255, 0.8) !important;
+}
+.mm-toolbar {
+  background-color: rgba(255, 255, 255, 0.7) !important;
+  backdrop-filter: blur(5px) !important;
+  -webkit-backdrop-filter: blur(5px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+}
+</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/markmap-toolbar@0.18.9/dist/style.css">
+</head>
+<body>
+<svg id="mindmap"></svg>
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/markmap-view@0.18.9/dist/browser/index.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/markmap-toolbar@0.18.9/dist/index.js"></script>
+<script>
+(function initializeMarkmap() {
+  const markmap = window.markmap;
+  const options = {
+    autoFit: true,
+    fitRatio: 0.95,
+    spacingHorizontal: 100,
+    spacingVertical: 10,
+    paddingX: 10,
+    nodeMinHeight: 20,
+    maxWidth: 300,
+    duration: 300,
+    zoom: true,
+    pan: true,
+    toggleRecursively: false,
+    initialExpandLevel: 1,
+    color: (node) => {
+      const reds = [
+        '#FF0000',
+        '#CC0000',
+        '#FF0000',
+        '#CC0000',
+        '#FF0000'
+      ];
+      return reds[node.state.depth % reds.length];
+    },
+    lineWidth: (node) => {
+      return 3 - node.state.depth * 0.5;
+    },
+  };
 
-function addImagePreview() {
-  const preview = document.createElement('div');
-  preview.className = 'topic-image-preview';
-  document.body.appendChild(preview);
+  // Dados do mapa mental (serão substituídos pelo script)
+  const data = __MARKMAP_DATA__;
+  
+  // Cria a instância do markmap
+  window.mm = markmap.Markmap.create(
+    "svg#mindmap",
+    options,
+    data
+  );
+  
+  // Configuração da toolbar
+  const toolbar = new markmap.Toolbar();
+  toolbar.setBrand(false);
+  
+  let currentLevel = 1;
+  const maxLevel = 5;
 
-  document.querySelectorAll('.markmap-node').forEach(node => {
-    const text = node.textContent.trim().toLowerCase();
-    const imagePath = `images/${text}.png`;
+  // Funções de controle de níveis
+  const controls = {
+    expandGradually: async () => {
+      currentLevel = currentLevel >= maxLevel ? 1 : currentLevel + 1;
+      window.mm.setOptions({ initialExpandLevel: currentLevel });
+      await new Promise(resolve => setTimeout(resolve, 300));
+      window.mm.fit();
+    },
+    
+    expandOneLevel: async () => {
+      if (currentLevel < maxLevel) {
+        currentLevel++;
+        window.mm.setOptions({ initialExpandLevel: currentLevel });
+        await new Promise(resolve => setTimeout(resolve, 300));
+        window.mm.fit();
+      }
+    },
+    
+    reduceOneLevel: async () => {
+      if (currentLevel > 1) {
+        currentLevel--;
+        window.mm.setOptions({ initialExpandLevel: currentLevel });
+        await new Promise(resolve => setTimeout(resolve, 300));
+        window.mm.fit();
+      }
+    },
+    
+    expandAll: async () => {
+      currentLevel = maxLevel;
+      window.mm.setOptions({ initialExpandLevel: currentLevel });
+      await new Promise(resolve => setTimeout(resolve, 300));
+      window.mm.fit();
+    },
+    
+    collapseToFirst: async () => {
+      currentLevel = 1;
+      window.mm.setOptions({ initialExpandLevel: currentLevel });
+      await new Promise(resolve => setTimeout(resolve, 300));
+      window.mm.fit();
+    }
+  };
 
-    node.addEventListener('mouseover', (e) => {
-      const img = new Image();
-      img.onload = () => {
-        preview.style.backgroundImage = `url(${imagePath})`;
-        preview.style.display = 'block';
-        preview.style.left = (e.pageX + 20) + 'px';
-        preview.style.top = (e.pageY - 50) + 'px';
-      };
-      img.src = imagePath;
-    });
+  // Registra os botões da toolbar
+  const buttons = [
+    {
+      id: 'recurse',
+      title: 'Expandir/Colapsar Gradualmente',
+      icon: 'M16 4h-12v12h12v-8h-8v4h2v-2h4v4h-8v-8h10z',
+      action: controls.expandGradually
+    },
+    {
+      id: 'expandOne',
+      title: 'Expandir Um Nível',
+      icon: 'M8 5v4H4v2h4v4l6-5z',
+      action: controls.expandOneLevel
+    },
+    {
+      id: 'reduceOne',
+      title: 'Reduzir Um Nível',
+      icon: 'M12 5v4h4v2h-4v4l-6-5z',
+      action: controls.reduceOneLevel
+    },
+    {
+      id: 'expandAll',
+      title: 'Expandir Todos os Níveis',
+      icon: 'M3 3h18v2H3zm0 8h18v2H3zm0 8h18v2H3zm4-4h10v2H7zm0-8h10v2H7z',
+      action: controls.expandAll
+    },
+    {
+      id: 'collapseToFirst',
+      title: 'Colapsar para o Primeiro Nível',
+      icon: 'M3 3h18v2H3zm0 8h18v2H3zm0 8h18v2H3z',
+      action: controls.collapseToFirst
+    }
+  ];
 
-    node.addEventListener('mouseout', () => {
-      preview.style.display = 'none';
-    });
-
-    node.addEventListener('mousemove', (e) => {
-      preview.style.left = (e.pageX + 20) + 'px';
-      preview.style.top = (e.pageY - 50) + 'px';
+  // Registra os botões
+  buttons.forEach(button => {
+    toolbar.register({
+      id: button.id,
+      title: button.title,
+      content: markmap.Toolbar.icon(button.icon),
+      onClick: button.action
     });
   });
-}
 
-// Função simplificada para adicionar imagens
-function addImagesToNodes() {
-  console.log('Iniciando adição de imagens...');
-  
-  // Remove imagens existentes
-  document.querySelectorAll('.topic-image').forEach(img => img.remove());
-  
-  // Adiciona novas imagens
-  document.querySelectorAll('.markmap-node').forEach(node => {
-    const text = node.textContent.trim().toLowerCase();
-    console.log('Processando nó:', text);
-    
-    const imagePath = `images/${text}.png`;
-    console.log('Caminho da imagem:', imagePath);
-    
-    // Cria elemento de imagem
-    const imageDiv = document.createElement('div');
-    imageDiv.className = 'topic-image';
-    
-    // Posiciona a imagem
-    const rect = node.getBoundingClientRect();
-    imageDiv.style.left = `${rect.left}px`;
-    imageDiv.style.top = `${rect.top - 100}px`;
-    
-    // Carrega a imagem
-    imageDiv.style.backgroundImage = `url(${imagePath})`;
-    document.body.appendChild(imageDiv);
-    
-    console.log('Imagem adicionada para:', text);
-  });
-}
-
-// Função para verificar quando o mapa está pronto
-function checkMapReady() {
-  console.log('Verificando se o mapa está pronto...');
-  const nodes = document.querySelectorAll('.markmap-node');
-  
-  if (nodes.length > 0) {
-    console.log('Mapa pronto! Encontrados', nodes.length, 'nós');
-    addImagesToNodes();
-    
-    // Adiciona listeners para atualização
-    window.addEventListener('resize', addImagesToNodes);
-    document.addEventListener('wheel', addImagesToNodes);
-    document.addEventListener('mouseup', addImagesToNodes);
-  } else {
-    console.log('Mapa ainda não está pronto, tentando novamente...');
-    setTimeout(checkMapReady, 500);
-  }
-}
-
-// Inicia o processo
-window.addEventListener('load', () => {
-  console.log('Página carregada, iniciando verificação do mapa...');
-  setTimeout(checkMapReady, 1000);
-}); 
+  // Configura a toolbar
+  toolbar.attach(window.mm);
+  const el = toolbar.render();
+  el.style.position = "absolute";
+  el.style.bottom = "20px";
+  el.style.right = "20px";
+  document.body.append(el);
+})();
+</script>
+</body>
+</html> 
