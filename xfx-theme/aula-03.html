@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<title>Markmap - Modo XFX</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+}
+body {
+  background: url('xfx.png') no-repeat center top fixed;
+  background-size: contain;
+  background-color: transparent;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+#mindmap {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+  background-color: transparent;
+}
+.markmap-node-text {
+  fill: #333 !important;
+  font-weight: 600 !important;
+  text-shadow: 0 0 3px rgba(255, 255, 255, 0.8) !important;
+}
+.mm-toolbar {
+  background-color: rgba(255, 255, 255, 0.7) !important;
+  backdrop-filter: blur(5px) !important;
+  -webkit-backdrop-filter: blur(5px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+}
+</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/markmap-toolbar@0.18.9/dist/style.css">
+</head>
+<body>
+<svg id="mindmap"></svg>
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/markmap-view@0.18.9/dist/browser/index.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/markmap-toolbar@0.18.9/dist/index.js"></script>
+<script>
+(function initializeMarkmap() {
+  const markmap = window.markmap;
+  const options = {
+    autoFit: true,
+    fitRatio: 0.95,
+    spacingHorizontal: 100,
+    spacingVertical: 10,
+    paddingX: 10,
+    nodeMinHeight: 20,
+    maxWidth: 300,
+    duration: 300,
+    zoom: true,
+    pan: true,
+    toggleRecursively: false,
+    initialExpandLevel: 1,
+    color: (node) => {
+      const reds = [
+        '#FF0000', // Vermelho puro
+        '#CC0000', // Vermelho escuro
+        '#FF0000', // Vermelho puro
+        '#CC0000', // Vermelho escuro
+        '#FF0000'  // Vermelho puro
+      ];
+      return reds[node.state.depth % reds.length];
+    },
+    lineWidth: (node) => {
+      return 3 - node.state.depth * 0.5;
+    },
+  };
+
+  // Dados do mapa mental (serão substituídos pelo script)
+  const data = {"content":"Curso de Formação: Transforme Sua Carreira","children":[{"content":"Público-Alvo","children":[{"content":"Desenvolvedores","children":[{"content":"Profissionais Experientes\n- Atualização técnica\n- Aprimoramento de habilidades","children":[],"payload":{"tag":"li"}},{"content":"Iniciantes\n- Base sólida\n- Prática inicial","children":[],"payload":{"tag":"li"}}],"payload":{"tag":"heading"}},{"content":"Não-Desenvolvedores","children":[{"content":"Profissionais em Transição\n- Conhecimentos tecnológicos\n- Impulso na carreira","children":[],"payload":{"tag":"li"}},{"content":"Entusiastas\n- Compreensão de tecnologias modernas\n- Aprendizado sem atuação direta","children":[],"payload":{"tag":"li"}}],"payload":{"tag":"heading"}},{"content":"Profissionais Autônomos","children":[{"content":"Autônomos\n- Ampliação de serviços\n- Carreira independente","children":[],"payload":{"tag":"li"}},{"content":"Freelancers\n- Diversificação de habilidades\n- Atendimento a demandas variadas","children":[],"payload":{"tag":"li"}}],"payload":{"tag":"heading"}},{"content":"Empreendedores e Candidatos","children":[{"content":"Empreendedores\n- Posicionamento estratégico\n- Projetos inovadores","children":[],"payload":{"tag":"li"}},{"content":"Candidatos a Vagas\n- Diferencial competitivo\n- Destaque em processos seletivos","children":[],"payload":{"tag":"li"}}],"payload":{"tag":"heading"}}],"payload":{"tag":"heading"}},{"content":"Estrutura da Formação","children":[{"content":"Conteúdo","children":[{"content":"Teoria e Prática combinadas","children":[],"payload":{"tag":"li"}},{"content":"Fundamentos essenciais","children":[],"payload":{"tag":"li"}},{"content":"Técnicas avançadas","children":[],"payload":{"tag":"li"}},{"content":"Aplicação imediata","children":[],"payload":{"tag":"li"}}],"payload":{"tag":"heading"}},{"content":"Metodologia","children":[{"content":"Abordagem gradual","children":[],"payload":{"tag":"li"}},{"content":"Princípios básicos","children":[],"payload":{"tag":"li"}},{"content":"Aplicações práticas","children":[],"payload":{"tag":"li"}},{"content":"Ideal para iniciantes e retomadas","children":[],"payload":{"tag":"li"}}],"payload":{"tag":"heading"}},{"content":"Flexibilidade","children":[{"content":"Escolha de trilhas","children":[],"payload":{"tag":"li"}},{"content":"Adaptação às necessidades","children":[],"payload":{"tag":"li"}},{"content":"Competências técnicas","children":[],"payload":{"tag":"li"}},{"content":"Habilidades estratégicas","children":[],"payload":{"tag":"li"}}],"payload":{"tag":"heading"}},{"content":"Recursos","children":[{"content":"Materiais de apoio","children":[],"payload":{"tag":"li"}},{"content":"Estudos de caso","children":[],"payload":{"tag":"li"}},{"content":"Atividades práticas","children":[],"payload":{"tag":"li"}},{"content":"Integração teoria-prática","children":[],"payload":{"tag":"li"}}],"payload":{"tag":"heading"}}],"payload":{"tag":"heading"}},{"content":"Objetivos","children":[{"content":"Transformação Profissional","children":[{"content":"Atuação autônoma","children":[],"payload":{"tag":"li"}},{"content":"Serviços freelancer","children":[],"payload":{"tag":"li"}},{"content":"Destaque em processos seletivos","children":[],"payload":{"tag":"li"}},{"content":"Sucesso profissional","children":[],"payload":{"tag":"li"}}],"payload":{"tag":"heading"}},{"content":"Resultados Esperados","children":[{"content":"Ferramentas necessárias","children":[],"payload":{"tag":"li"}},{"content":"Inovação e adaptabilidade","children":[],"payload":{"tag":"li"}},{"content":"Diferencial no mercado","children":[],"payload":{"tag":"li"}},{"content":"Competitividade","children":[],"payload":{"tag":"li"}}],"payload":{"tag":"heading"}}],"payload":{"tag":"heading"}}]};
+  
+  // Cria a instância do markmap
+  window.mm = markmap.Markmap.create(
+    "svg#mindmap",
+    options,
+    data
+  );
+  
+  // Configuração da toolbar
+  const toolbar = new markmap.Toolbar();
+  toolbar.setBrand(false);
+  
+  let currentLevel = 1;
+  const maxLevel = 5;
+
+  // Funções de controle de níveis
+  const controls = {
+    expandGradually: async () => {
+      currentLevel = currentLevel >= maxLevel ? 1 : currentLevel + 1;
+      window.mm.setOptions({ initialExpandLevel: currentLevel });
+      await new Promise(resolve => setTimeout(resolve, 300));
+      window.mm.fit();
+    },
+    
+    expandOneLevel: async () => {
+      if (currentLevel < maxLevel) {
+        currentLevel++;
+        window.mm.setOptions({ initialExpandLevel: currentLevel });
+        await new Promise(resolve => setTimeout(resolve, 300));
+        window.mm.fit();
+      }
+    },
+    
+    reduceOneLevel: async () => {
+      if (currentLevel > 1) {
+        currentLevel--;
+        window.mm.setOptions({ initialExpandLevel: currentLevel });
+        await new Promise(resolve => setTimeout(resolve, 300));
+        window.mm.fit();
+      }
+    },
+    
+    expandAll: async () => {
+      currentLevel = maxLevel;
+      window.mm.setOptions({ initialExpandLevel: currentLevel });
+      await new Promise(resolve => setTimeout(resolve, 300));
+      window.mm.fit();
+    },
+    
+    collapseToFirst: async () => {
+      currentLevel = 1;
+      window.mm.setOptions({ initialExpandLevel: currentLevel });
+      await new Promise(resolve => setTimeout(resolve, 300));
+      window.mm.fit();
+    }
+  };
+
+  // Registra os botões da toolbar
+  const buttons = [
+    {
+      id: 'recurse',
+      title: 'Expandir/Colapsar Gradualmente',
+      icon: 'M16 4h-12v12h12v-8h-8v4h2v-2h4v4h-8v-8h10z',
+      action: controls.expandGradually
+    },
+    {
+      id: 'expandOne',
+      title: 'Expandir Um Nível',
+      icon: 'M8 5v4H4v2h4v4l6-5z',
+      action: controls.expandOneLevel
+    },
+    {
+      id: 'reduceOne',
+      title: 'Reduzir Um Nível',
+      icon: 'M12 5v4h4v2h-4v4l-6-5z',
+      action: controls.reduceOneLevel
+    },
+    {
+      id: 'expandAll',
+      title: 'Expandir Todos os Níveis',
+      icon: 'M3 3h18v2H3zm0 8h18v2H3zm0 8h18v2H3zm4-4h10v2H7zm0-8h10v2H7z',
+      action: controls.expandAll
+    },
+    {
+      id: 'collapseToFirst',
+      title: 'Colapsar para o Primeiro Nível',
+      icon: 'M3 3h18v2H3zm0 8h18v2H3zm0 8h18v2H3z',
+      action: controls.collapseToFirst
+    }
+  ];
+
+  // Registra os botões
+  buttons.forEach(button => {
+    toolbar.register({
+      id: button.id,
+      title: button.title,
+      content: markmap.Toolbar.icon(button.icon),
+      onClick: button.action
+    });
+  });
+
+  // Configura a toolbar
+  toolbar.attach(window.mm);
+  const el = toolbar.render();
+  el.style.position = "absolute";
+  el.style.bottom = "20px";
+  el.style.right = "20px";
+  document.body.append(el);
+
+  // Ajuste automático ao renderizar
+  window.mm.on('renderData', () => {
+    setTimeout(() => window.mm.fit(), 300);
+  });
+})();</script>
+</body>
+</html>
