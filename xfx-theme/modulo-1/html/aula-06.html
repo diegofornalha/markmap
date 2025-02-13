@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<title>Markmap - Modo XFX</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  body {
+    background-size: 150% auto;
+  }
+  .mm-toolbar {
+    transform: scale(0.9);
+    transform-origin: top left;
+  }
+}
+body {
+  background: url('xfx.png') no-repeat center top fixed;
+  background-size: contain;
+  background-color: transparent;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+#mindmap {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+  background-color: transparent;
+}
+.markmap-node-text {
+  fill: #333 !important;
+  font-weight: 600 !important;
+  text-shadow: 0 0 3px rgba(255, 255, 255, 0.8) !important;
+  transition: all 0.3s ease !important;
+}
+
+.markmap-node-text:hover {
+  fill: #FF0000 !important;
+  transform: scale(1.05) !important;
+}
+.mm-toolbar {
+  background-color: rgba(255, 255, 255, 0.7) !important;
+  backdrop-filter: blur(5px) !important;
+  -webkit-backdrop-filter: blur(5px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+  transition: all 0.3s ease !important;
+}
+
+.mm-toolbar:hover {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  transform: translateY(2px) !important;
+}
+
+/* Estilos para o preview de imagem */
+.topic-image-preview {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+  z-index: 9999;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border: 2px solid #FF0000;
+  background-color: #fff;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.image-layer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 100;
+}
+
+.topic-image {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border: 2px solid #FF0000;
+  background-color: #fff;
+}
+</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/markmap-toolbar@0.18.9/dist/style.css">
+</head>
+<body>
+<svg id="mindmap"></svg>
+<div id="imagePreview" class="topic-image-preview"></div>
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/markmap-view@0.18.9/dist/browser/index.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/markmap-toolbar@0.18.9/dist/index.js"></script>
+<script>
+(function initializeMarkmap() {
+  const markmap = window.markmap;
+  const options = {
+    autoFit: true,
+    fitRatio: 0.95,
+    spacingHorizontal: 100,
+    spacingVertical: 10,
+    paddingX: 10,
+    nodeMinHeight: 20,
+    maxWidth: 300,
+    duration: 300,
+    zoom: true,
+    pan: true,
+    toggleRecursively: false,
+    initialExpandLevel: 1,
+    color: (node) => {
+      const reds = [
+        '#FF0000', // Vermelho puro
+        '#CC0000', // Vermelho escuro
+        '#FF0000', // Vermelho puro
+        '#CC0000', // Vermelho escuro
+        '#FF0000'  // Vermelho puro
+      ];
+      return reds[node.state.depth % reds.length];
+    },
+    lineWidth: (node) => {
+      return 3 - node.state.depth * 0.5;
+    },
+  };
+
+  // Dados do mapa mental (serão substituídos pelo script)
+  const data = {"content":"WhatsApp Flow Automation","children":[{"content":"Objetivo","children":[{"content":"Automação WhatsApp via n8n","children":[],"payload":{"tag":"li"}},{"content":"Integração com Z-API","children":[],"payload":{"tag":"li"}},{"content":"Interação dinâmica com usuários","children":[],"payload":{"tag":"li"}}],"payload":{"tag":"heading"}},{"content":"Componentes","children":[{"content":"Entrada","children":[{"content":"Start","children":[],"payload":{"tag":"li"}},{"content":"Webhook Z-API\n- Endpoint: `zapi`\n- Método: POST","children":[],"payload":{"tag":"li"}}],"payload":{"tag":"heading"}},{"content":"Configuração","children":[{"content":"Constantes JavaScript\n- Endpoints dinâmicos\n- URLs de mídia\n- Flags de controle\n- Tempo de espera","children":[],"payload":{"tag":"li"}}],"payload":{"tag":"heading"}},{"content":"Lista de Opções","children":[{"content":"Mensagem","children":[],"payload":{"tag":"li"}},{"content":"Link","children":[],"payload":{"tag":"li"}},{"content":"Áudio","children":[],"payload":{"tag":"li"}},{"content":"Vídeo","children":[],"payload":{"tag":"li"}},{"content":"Imagem","children":[],"payload":{"tag":"li"}},{"content":"Documento","children":[],"payload":{"tag":"li"}},{"content":"Contato","children":[],"payload":{"tag":"li"}}],"payload":{"tag":"heading"}}],"payload":{"tag":"heading"}},{"content":"Fluxo de Execução","children":[{"content":"Recepção","children":[{"content":"Webhook capta mensagem","children":[],"payload":{"tag":"li"}},{"content":"Configuração de parâmetros","children":[],"payload":{"tag":"li"}},{"content":"Montagem da lista","children":[],"payload":{"tag":"li"}}],"payload":{"tag":"heading"}},{"content":"Processamento","children":[{"content":"Envio da lista","children":[],"payload":{"tag":"li"}},{"content":"Verificação de resposta","children":[],"payload":{"tag":"li"}},{"content":"Roteamento condicional\n- Resposta lista 1\n- Resposta lista 2","children":[],"payload":{"tag":"li"}}],"payload":{"tag":"heading"}},{"content":"Ações","children":[{"content":"HTTP Requests\n- Envio de texto\n- Envio de link\n- Envio de mídia\n- Envio de contato","children":[],"payload":{"tag":"li"}},{"content":"Autenticação via Client-Token","children":[],"payload":{"tag":"li"}}],"payload":{"tag":"heading"}}],"payload":{"tag":"heading"}}]};
+  
+  // Cria a instância do markmap
+  window.mm = markmap.Markmap.create(
+    "svg#mindmap",
+    options,
+    data
+  );
+  
+  // Configuração da toolbar
+  const toolbar = new markmap.Toolbar();
+  toolbar.setBrand(false);
+  
+  let currentLevel = 1;
+  const maxLevel = 5;
+
+  // Funções de controle de níveis
+  const controls = {
+    expandGradually: async () => {
+      currentLevel = currentLevel >= maxLevel ? 1 : currentLevel + 1;
+      window.mm.setOptions({ initialExpandLevel: currentLevel });
+      await new Promise(resolve => setTimeout(resolve, 300));
+      window.mm.fit();
+    },
+    
+    expandOneLevel: async () => {
+      if (currentLevel < maxLevel) {
+        currentLevel++;
+        window.mm.setOptions({ initialExpandLevel: currentLevel });
+        await new Promise(resolve => setTimeout(resolve, 300));
+        window.mm.fit();
+      }
+    },
+    
+    reduceOneLevel: async () => {
+      if (currentLevel > 1) {
+        currentLevel--;
+        window.mm.setOptions({ initialExpandLevel: currentLevel });
+        await new Promise(resolve => setTimeout(resolve, 300));
+        window.mm.fit();
+      }
+    },
+    
+    expandAll: async () => {
+      currentLevel = maxLevel;
+      window.mm.setOptions({ initialExpandLevel: currentLevel });
+      await new Promise(resolve => setTimeout(resolve, 300));
+      window.mm.fit();
+    },
+    
+    collapseToFirst: async () => {
+      currentLevel = 1;
+      window.mm.setOptions({ initialExpandLevel: currentLevel });
+      await new Promise(resolve => setTimeout(resolve, 300));
+      window.mm.fit();
+    }
+  };
+
+  // Registra os botões da toolbar
+  const buttons = [
+    {
+      id: 'recurse',
+      title: 'Expandir/Colapsar Gradualmente',
+      icon: 'M16 4h-12v12h12v-8h-8v4h2v-2h4v4h-8v-8h10z',
+      action: controls.expandGradually
+    },
+    {
+      id: 'expandOne',
+      title: 'Expandir Um Nível',
+      icon: 'M8 5v4H4v2h4v4l6-5z',
+      action: controls.expandOneLevel
+    },
+    {
+      id: 'reduceOne',
+      title: 'Reduzir Um Nível',
+      icon: 'M12 5v4h4v2h-4v4l-6-5z',
+      action: controls.reduceOneLevel
+    },
+    {
+      id: 'expandAll',
+      title: 'Expandir Todos os Níveis',
+      icon: 'M3 3h18v2H3zm0 8h18v2H3zm0 8h18v2H3zm4-4h10v2H7zm0-8h10v2H7z',
+      action: controls.expandAll
+    },
+    {
+      id: 'collapseToFirst',
+      title: 'Colapsar para o Primeiro Nível',
+      icon: 'M3 3h18v2H3zm0 8h18v2H3zm0 8h18v2H3z',
+      action: controls.collapseToFirst
+    }
+  ];
+
+  // Registra os botões
+  buttons.forEach(button => {
+    toolbar.register({
+      id: button.id,
+      title: button.title,
+      content: markmap.Toolbar.icon(button.icon),
+      onClick: button.action
+    });
+  });
+
+  // Configura a toolbar
+  toolbar.attach(window.mm);
+  const el = toolbar.render();
+  el.style.position = "absolute";
+  el.style.bottom = "20px";
+  el.style.right = "20px";
+  document.body.append(el);
+
+  // Cria a camada de imagens
+  const imageLayer = document.createElement('div');
+  imageLayer.className = 'image-layer';
+  document.body.appendChild(imageLayer);
+
+  // Função para posicionar as imagens
+  function setupImages() {
+    // Limpa a camada
+    imageLayer.innerHTML = '';
+    
+    // Adiciona imagens para cada nó
+    d3.select('#mindmap')
+      .selectAll('g')
+      .each(function(d) {
+        if (!d) return;
+        
+        const node = d3.select(this);
+        const circle = node.select('circle');
+        
+        if (!circle.empty()) {
+          const topicName = d.data.content.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+          const rect = circle.node().getBoundingClientRect();
+          
+          // Cria elemento da imagem
+          const img = document.createElement('div');
+          img.className = 'topic-image';
+          img.style.backgroundImage = `url(images/${topicName}.png)`;
+          img.style.left = `${rect.x - 50}px`;
+          img.style.top = `${rect.y - 120}px`;
+          
+          imageLayer.appendChild(img);
+        }
+      });
+  }
+
+  // Atualiza as imagens quando necessário
+  window.mm.on('renderData', () => {
+    setTimeout(setupImages, 100);
+  });
+
+  window.mm.on('zoom', setupImages);
+  window.mm.on('pan', setupImages);
+})();
+</script>
+</body>
+</html>
